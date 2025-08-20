@@ -11,22 +11,25 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f0f2f5;
+            background-color: #000000;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            color: #ffffff;
         }
         .container {
-            background-color: #ffffff;
-            padding: 40px;
+            /* Adaptación del estilo de 'Card' */
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 215, 0, 0.3); /* 'border-yellow-500/30' */
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+            padding: 40px;
             width: 100%;
             max-width: 600px;
             text-align: center;
         }
         h1 {
-            color: #333;
+            color: #ffffff;
             margin-bottom: 20px;
         }
         .input-group {
@@ -37,49 +40,57 @@
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-            color: #555;
+            color: #ffffff;
         }
         .input-group input {
+            /* Adaptación del estilo de 'InputGold' */
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #ffd700; /* 'border-yellow-500' */
             border-radius: 8px;
             box-sizing: border-box;
             transition: border-color 0.3s;
+            background-color: rgba(0, 0, 0, 0.5); /* 'bg-black/50' */
+            color: #ffffff;
+            text-align: center;
         }
         .input-group input:focus {
-            border-color: #007bff;
             outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.5); /* 'focus:ring-2 focus:ring-yellow-400' */
         }
         button {
+            /* Adaptación del estilo de 'GoldButton' */
             width: 100%;
             padding: 15px;
             font-size: 16px;
             font-weight: bold;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
+            color: #ffd700; /* 'text-yellow-500' */
+            background-color: #000000; /* 'bg-black' */
+            border: 2px solid #ffd700; /* 'border-2 border-yellow-500' */
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: background-color 0.3s, transform 0.2s, color 0.3s, box-shadow 0.3s;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #ffd700; /* 'hover:bg-yellow-500' */
+            color: #000000; /* 'hover:text-black' */
+            box-shadow: 0 4px 6px rgba(255, 215, 0, 0.5); /* 'hover:shadow-lg hover:shadow-yellow-500/50' */
             transform: translateY(-2px);
         }
         .result {
             margin-top: 25px;
             font-size: 1.2em;
             font-weight: bold;
-            color: #333;
-            background-color: #f9f9f9;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, 0.4);
             padding: 15px;
             border-radius: 8px;
-            border: 1px dashed #ccc;
+            border: 1px dashed rgba(255, 215, 0, 0.5);
             word-break: break-all;
         }
         .error {
-            color: #dc3545;
+            color: #ffdd00;
             font-size: 0.9em;
             margin-top: 10px;
         }
@@ -103,11 +114,9 @@
 </div>
 
 <script type="module">
-    // URLs de Viem actualizadas a la versión 2.20.1
     import { createPublicClient, http, parseAbi, formatUnits } from 'https://esm.sh/viem';
     import { worldchain } from 'https://esm.sh/viem/chains';
     
-    // Definición del ABI simplificada para balanceOf, decimals y symbol
     const tokenAbi = parseAbi([
         'function balanceOf(address owner) view returns (uint256)',
         'function decimals() view returns (uint8)',
