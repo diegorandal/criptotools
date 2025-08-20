@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Saldo de World Chain</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+            word-break: break-all;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Saldo Token ERC20 @ WorldChain</h1>
+    <div class="input-group">
+        <label for="contractAddress">Dirección del Contrato ERC20</label>
+        <input type="text" id="contractAddress" value="0xA3502E3348B549ba45Af8726Ee316b490f308dDC" placeholder="Ej: 0x...">
+    </div>
+    <div class="input-group">
+        <label for="walletAddress">Dirección de la Wallet</label>
+        <input type="text" id="walletAddress" placeholder="Ej: 0x...">
+    </div>
+    <button id="checkButton">Consultar Saldo</button>
+    <div id="result" class="result" style="display:none;"></div>
+    <div id="error-message" class="error" style="display:none;"></div>
+</div>
+
+<script type="module">
+    // URLs de Viem actualizadas a la versión 2.20.1
+    import { createPublicClient, http, parseAbi, formatUnits } from 'https://esm.sh/viem';
+    import { worldchain } from 'https://esm.sh/viem/chains';
+    
+    // Definición del ABI simplificada para balanceOf, decimals y symbol
+    const tokenAbi = parseAbi([
+        'function balanceOf(address owner) view returns (uint256)',
+        'function decimals() view returns (uint8)',
+        'function symbol() view returns (string)',
+    ]);
+
+    const client = createPublicClient({
+        chain: worldchain,
+        transport: http('https://worldchain-mainnet.g.alchemy.com/public'),
+    });
+
+    const checkButton = document.getElementById('checkButton');
+
+    checkButton.addEventListener('click', async () => {
+        const contractAddress = document.getElementById('contractAddress').value;
+        const walletAddress = document.getElementById('walletAddress').value;
+        const resultDiv = document.getElementById('result');
+        const errorDiv = document.getElementById('error-message');
+
+        resultDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        resultDiv.innerHTML = '';
+        errorDiv.innerHTML = '';
+
+        if (!contractAddress || !walletAddress) {
+            errorDiv.innerHTML = 'Por favor, introduce ambas direcciones.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        try {
+            const decimals = await client.readContract({
+                address: contractAddress,
+                abi: tokenAbi,
+                functionName: 'decimals',
+            });
+            const symbol = await client.readContract({
+                address: contractAddress,
+                abi: tokenAbi,
+                functionName: 'symbol',
+            });
+
+            const rawBalance = await client.readContract({
+                address: contractAddress,
+                abi: tokenAbi,
+                functionName: 'balanceOf',
+                args: [walletAddress],
+            });
+
+            const formattedBalance = formatUnits(rawBalance, decimals);
+
+            resultDiv.innerHTML = `Saldo: ${parseFloat(formattedBalance).toFixed(4)} ${symbol}`;
+            resultDiv.style.display = 'block';
+
+        } catch (e) {
+            console.error('Error al consultar el saldo:', e);
+            errorDiv.innerHTML = `Error: No se pudo consultar el saldo. Asegúrate de que las direcciones son correctas.`;
+            errorDiv.style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>
